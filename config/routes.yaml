@@ -5,3 +5,19 @@ controllers:
 kernel:
     resource: ../src/Kernel.php
     type: annotation
+
+home:
+    path: /
+    controller: App\Controller\MainController::home
+
+login:
+    path: /login
+    controller: App\Controller\MainController::login
+
+stats:
+    path: /stats
+    controller: App\Controller\StatsController::display
+
+table:
+    path: /table
+    controller: App\Controller\TableController::display
