@@ -12,7 +12,6 @@ class MainController extends AbstractController{
     public function home(Request $request) : RedirectResponse {
         $session = new Session();
         $session->start();
-        $session->set('logged',TRUE);
         if (empty($session->get('logged'))) { //Si on est pas log 
             return $this->redirectToRoute('login');
         }
