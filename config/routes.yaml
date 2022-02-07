@@ -31,5 +31,5 @@ stats_nointerraction:
     controller: App\Controller\StatsController::nointerraction
 
 table:
-    path: /table
-    controller: App\Controller\TableController::display
+    path: /api/table
+    controller: App\Controller\TableController::getTable

@@ -9,14 +9,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TableController extends AbstractController {
 
-    public function display(Request $request) {
+
+    public function getTable(Request $request) {
         $session = new Session();
         $session->start();
-        if (empty($session->get('logged'))) { //Si on est pas log 
-            return $this->redirectToRoute('login');
+        if (!empty($session->get('logged'))) {
+            $db=$this->model->getInstance();
+            $query='';
+            $statement=$db->prepare($query);
+            $statement->execute();
+            $result=$statement->fetchAll();
+            $result_json=json_encode($result);
+            $response = new Response($result_json,200, [
+                "Content-Type" => "application/json"
+            ]);       
         }
-        else { //Si on est log
-            dd("Tu es bien log, bravo");
+        else {
+            $response = new Response('>Accès Interdit',403);
         }
+        return $response;
     }
 }
