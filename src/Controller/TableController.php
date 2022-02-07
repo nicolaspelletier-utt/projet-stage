@@ -25,7 +25,7 @@ class TableController extends AbstractController {
             ]);       
         }
         else {
-            $response = new Response('>Accès Interdit',403);
+            $response = new Response('Accès Interdit',403);
         }
         return $response;
     }
