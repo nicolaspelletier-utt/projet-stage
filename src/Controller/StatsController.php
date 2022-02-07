@@ -16,19 +16,85 @@ class StatsController extends AbstractController {
     {
         $this->model = $model;
     }
-    public function display(Request $request) {
+   
+    public function posts(Request $request) {
         $session = new Session();
         $session->start();
-        $db=$this->model->getInstance();
-        if (empty($session->get('logged'))) { //Si on est pas log 
-            return $this->redirectToRoute('login');
-        }
-        else { //Si on est log
-  
-            $statement=$db->prepare('SELECT * FROM data_posts LIMIT 10');
+        if (!empty($session->get('logged'))) {
+            $db=$this->model->getInstance();
+            $query='';
+            $statement=$db->prepare($query);
             $statement->execute();
             $result=$statement->fetchAll();
-            dd($result);
+            $result_json=json_encode($result);
+            $response = new Response($result_json,200, [
+                "Content-Type" => "application/json"
+            ]);
         }
+        else {
+            $response = new Response('Accès Interdit',403);
+        }
+        return $response;
+
+    }
+    public function comments(Request $request) {
+        $session = new Session();
+        $session->start();
+        if (!empty($session->get('logged'))) {
+            $db=$this->model->getInstance();
+            $query='';
+            $statement=$db->prepare($query);
+            $statement->execute();
+            $result=$statement->fetchAll();
+            $result_json=json_encode($result);
+            $response = new Response($result_json,200, [
+                "Content-Type" => "application/json"
+            ]);
+        }
+        else {
+            $response = new Response('Accès Interdit',403);
+        }
+        return $response;
+
+    }
+    public function users(Request $request) {
+        $session = new Session();
+        $session->start();
+        if (!empty($session->get('logged'))) {
+            $db=$this->model->getInstance();
+            $query='';
+            $statement=$db->prepare($query);
+            $statement->execute();
+            $result=$statement->fetchAll();
+            $result_json=json_encode($result);
+            $response = new Response($result_json,200, [
+                "Content-Type" => "application/json"
+            ]);
+        }
+        else {
+            $response = new Response('Accès Interdit',403);
+        }
+        return $response;
+
+    } 
+    public function nointerraction(Request $request) {
+        $session = new Session();
+        $session->start();
+        if (!empty($session->get('logged'))) {
+            $db=$this->model->getInstance();
+            $query='';
+            $statement=$db->prepare($query);
+            $statement->execute();
+            $result=$statement->fetchAll();
+            $result_json=json_encode($result);
+            $response = new Response($result_json,200, [
+                "Content-Type" => "application/json"
+            ]);
+        }
+        else {
+            $response = new Response('Accès Interdit',403);
+        }
+        return $response;
+
     }
 }

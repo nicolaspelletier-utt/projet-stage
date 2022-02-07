@@ -14,9 +14,21 @@ login:
     path: /login
     controller: App\Controller\MainController::login
 
-stats:
-    path: /stats
-    controller: App\Controller\StatsController::display
+stats_posts:
+    path: /api/stats/posts
+    controller: App\Controller\StatsController::posts
+
+stats_comments:
+    path: /api/stats/comments
+    controller: App\Controller\StatsController::comments
+
+stats_users:
+    path: /api/stats/users
+    controller: App\Controller\StatsController::users
+
+stats_nointerraction:
+    path: /api/stats/nointerraction
+    controller: App\Controller\StatsController::nointerraction
 
 table:
     path: /table
