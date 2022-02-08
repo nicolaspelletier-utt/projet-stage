@@ -12,7 +12,7 @@ home:
 
 login:
     path: /login
-    controller: App\Controller\MainController::login
+    controller: App\Controller\AuthController::login
 
 stats_posts:
     path: /api/stats/posts
