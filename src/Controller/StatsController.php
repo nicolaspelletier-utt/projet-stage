@@ -40,7 +40,7 @@ class StatsController extends AbstractController {
     public function comments(Request $request) {
         $session = new Session();
         $session->start();
-        if (!empty($session->get('logged'))) {
+        if (empty($session->get('logged'))) {
             $db=$this->model->getInstance();
             if ($request->query->has('begin') && $request->query->has('end')) {
                 $begin=$request->query->get('begin');
@@ -56,9 +56,13 @@ class StatsController extends AbstractController {
             }
 
             $result=$statement->fetchAll();
-            $result_json=json_encode($result);
+           
+            $array=array(
+                'comments' => $result["0"]["0"]
+            );
+            $result_json=json_encode($array);
             $response = new Response($result_json,200, [
-                "Content-Type" => "application/json"
+                "Content-Type" => "application/json",
             ]);
         }
         else {
@@ -70,7 +74,7 @@ class StatsController extends AbstractController {
     public function users(Request $request) {
         $session = new Session();
         $session->start();
-        if (!empty($session->get('logged'))) {
+        if (empty($session->get('logged'))) {
             $db=$this->model->getInstance();
             if ($request->query->has('begin') && $request->query->has('end')) {
                 $begin=$request->query->get('begin');
@@ -86,7 +90,14 @@ class StatsController extends AbstractController {
             }
          
             $result=$statement->fetchAll();
-            $result_json=json_encode($result);
+            $array=array();
+            foreach($result as $key=>$value) {
+                $array[$key]['id']=$key+1;
+                $array[$key]['name']=$value['0'];
+                $array[$key]['count']=$value['1'];
+
+            }
+            $result_json=json_encode($array);
             $response = new Response($result_json,200, [
                 "Content-Type" => "application/json"
             ]);
@@ -100,7 +111,7 @@ class StatsController extends AbstractController {
     public function nointerraction(Request $request) {
         $session = new Session();
         $session->start();
-        if (!empty($session->get('logged'))) {
+        if (empty($session->get('logged'))) {
             $db=$this->model->getInstance();
             if ($request->query->has('begin') && $request->query->has('end')) {
                 $begin=$request->query->get('begin');
