@@ -127,7 +127,13 @@ class StatsController extends AbstractController {
             }
             
             $result=$statement->fetchAll();
-            $result_json=json_encode($result);
+            $array=array();
+            foreach($result as $key=>$value) {
+                $array[$key]['id']=$key+1;
+                $array[$key]['name']=$value['0'];
+
+            }
+            $result_json=json_encode($array);
             $response = new Response($result_json,200, [
                 "Content-Type" => "application/json"
             ]);
