@@ -7,46 +7,61 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use App\Model\Model;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AuthController extends AbstractController {
     protected $model;
+    protected $requestStack;
 
-    public function __construct(model $model) 
+    public function __construct(model $model, RequestStack $requestStack) 
     {
-        $this->model = $model;        
+        $this->model = $model;   
+        $this->requestStack = $requestStack;   
     }
     public function login(Request $request) {
-        $session = new Session();
-        $session->start();
-        if (!empty($session->get('logged'))) {
-            if ($request->request->has('login')&&$request->request->has('passwd')) {
+        $session = $this->requestStack->getSession();
+        $json=$request->getContent();
+        $jsondecode=json_decode($json,true);
+        $login=$jsondecode['login'];
+        $passwd=$jsondecode['passwd'];
+        if (!$session->has('logged')) {
                 $db=$this->model->getInstance();
-                $hash=hash('sha512',md5(htmlentities($request->request->get('login'))) . htmlentities($request->request->get('passwd')));
-                $query="select id from authentification where hash=?";
-                $statement=$db->prepare($hash);
+                $hash=hash('sha512',md5(htmlentities($login)) . htmlentities($passwd));
+                $query="select id from authentification where hash='" . $hash . "'";
+                $statement=$db->prepare($query);
                 $statement->execute();
                 $results = $statement->fetchAll();
                 if (count($results)!=0) {
                     $session->set('logged',true);
-                }    
-            }
-            if (!empty($session->get('logged'))) {
-                $array=array('logged',true);
+                }                    
+            if ($session->has('logged')) {
+                $array['logged']=true;
             }
             else {
-                $array=array('logged',false);
+                //Echec d'authentification
+                $array['logged']=false;
             }
         }
         else {
-            $array=array('logged',true);
+            //Utilisateur déjà log
+            $array['logged']=true;
         }
-        $array_json=json_encode($array);
-        $response = new Response($array_json,200,[
-            "Content-Type" => "application/json"
-        ]);
-        return $response;
+        return $this->json($array,200);
+        //$array_json=json_encode($array);
         
 
         
     }
+    public function Logout(Request $request) {
+        $session = $this->requestStack->getSession();
+        $session->remove('logged');
+        $session->clear();
+        $session = $this->requestStack->getSession();
+        $response = new Response('Success',200);
+        $response->headers->clearCookie('PHPSESSID');
+        $session->invalidate();
+        session_destroy();
+        return $response;
+    }
+    
 }

@@ -7,20 +7,21 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use App\Model\Model;
-
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class StatsController extends AbstractController {
     protected $model;
+    protected $requestStack;
 
-    public function __construct(Model $model)
+    public function __construct(Model $model,RequestStack $requestStack)
     {
         $this->model = $model;
+        $this->requestStack = $requestStack;
     }
    
-    public function posts(Request $request) {
-        $session = new Session();
-        $session->start();
-        if (!empty($session->get('logged'))) {
+    public function posts(Request $request, RequestStack $requestStack) {
+        $session = $requestStack->getSession();
+        if ($session->has('logged')) {
             $db=$this->model->getInstance();
             $query='';
             $statement=$db->prepare($query);
@@ -38,9 +39,8 @@ class StatsController extends AbstractController {
 
     }
     public function comments(Request $request) {
-        $session = new Session();
-        $session->start();
-        if (empty($session->get('logged'))) {
+        $session = $this->requestStack->getSession();
+        if ($session->has('logged')) {
             $db=$this->model->getInstance();
             if ($request->query->has('begin') && $request->query->has('end')) {
                 $begin=$request->query->get('begin');
@@ -72,9 +72,9 @@ class StatsController extends AbstractController {
 
     }
     public function users(Request $request) {
-        $session = new Session();
-        $session->start();
-        if (empty($session->get('logged'))) {
+        $session = $this->requestStack->getSession();
+
+        if ($session->has('logged')) {
             $db=$this->model->getInstance();
             if ($request->query->has('begin') && $request->query->has('end')) {
                 $begin=$request->query->get('begin');
@@ -108,10 +108,10 @@ class StatsController extends AbstractController {
         return $response;
 
     } 
-    public function nointerraction(Request $request) {
-        $session = new Session();
-        $session->start();
-        if (empty($session->get('logged'))) {
+    public function nointerraction(Request $request, RequestStack $requestStack) {
+        $session = $requestStack->getSession();
+
+        if ($session->has('logged')) {
             $db=$this->model->getInstance();
             if ($request->query->has('begin') && $request->query->has('end')) {
                 $begin=$request->query->get('begin');

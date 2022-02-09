@@ -11,7 +11,7 @@ home:
     controller: App\Controller\MainController::home
 
 login:
-    path: /login
+    path: /api/login
     controller: App\Controller\AuthController::login
 
 stats_posts:
@@ -33,3 +33,7 @@ stats_nointerraction:
 table:
     path: /api/table
     controller: App\Controller\TableController::getTable
+
+logout:
+    path: /api/logout
+    controller: App\Controller\AuthController::logout
