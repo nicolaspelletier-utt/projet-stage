@@ -18,6 +18,16 @@ class AuthController extends AbstractController {
         $this->model = $model;   
         $this->requestStack = $requestStack;   
     }
+    public function isLogged(Request $request) {
+        $session=$this->requestStack->getSession();
+        if ($session->has('logged')) {
+            $array['logged']=true;
+        }
+        else {
+            $array['logged']=false;
+        }
+        return $this->json($array,200);
+    }
     public function login(Request $request) {
         $session = $this->requestStack->getSession();
         $json=$request->getContent();
