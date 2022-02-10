@@ -33,8 +33,13 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('Accès Interdit',403);
-        }
+            $response = new Response('redirect',301,[
+                "Location" => "localhost:3000/login",
+                "Access-Control-Allow-Origin" => "*",
+                "Access-Control-Allow-Headers" => "*"
+
+
+            ]);        }
         return $response;
 
     }
@@ -42,7 +47,7 @@ class StatsController extends AbstractController {
         $session = $this->requestStack->getSession();
         if ($session->has('logged')) {
             $db=$this->model->getInstance();
-            if ($request->query->has('begin') && $request->query->has('end')) {
+            if ($request->query->get('begin')!='' && $request->query->get('end')!='') {
                 $begin=$request->query->get('begin');
                 $end=$request->query->get('end');
                 $query= 'select avg(de.value) from (select count(c.comment_id) as value from data_comments c where c.created_time between ? and ? group by c.post_id) de  ';
@@ -66,7 +71,13 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('Accès Interdit',403);
+            $response = new Response('redirect',301,[
+                "Location" => "localhost:3000/login",
+                "Access-Control-Allow-Origin" => "*",
+                "Access-Control-Allow-Headers" => "*"
+
+
+            ]);
         }
         return $response;
 
@@ -76,7 +87,7 @@ class StatsController extends AbstractController {
 
         if ($session->has('logged')) {
             $db=$this->model->getInstance();
-            if ($request->query->has('begin') && $request->query->has('end')) {
+            if ($request->query->get('begin')!='' && $request->query->get('end')!='') {
                 $begin=$request->query->get('begin');
                 $end=$request->query->get('end');
                 $query='select u.people_name, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and p.created_time between ? and ? group by u.people_id order by  count(p.post_id) DESC limit 10 ';
@@ -103,8 +114,13 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('Accès Interdit',403);
-        }
+            $response = new Response('redirect',301,[
+                "Location" => "localhost:3000/login",
+                "Access-Control-Allow-Origin" => "*",
+                "Access-Control-Allow-Headers" => "*"
+
+
+            ]);        }
         return $response;
 
     } 
@@ -113,7 +129,7 @@ class StatsController extends AbstractController {
 
         if ($session->has('logged')) {
             $db=$this->model->getInstance();
-            if ($request->query->has('begin') && $request->query->has('end')) {
+            if ($request->query->get('begin')!='' && $request->query->get('end')!='') {
                 $begin=$request->query->get('begin');
                 $end=$request->query->get('end');
                 $query="select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r where r.created_time between '2021-07-01 15:02:00' and '2021-07-31 15:02:30') and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10";
@@ -139,8 +155,11 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('Accès Interdit',403);
-        }
+            $response = new Response('redirect',301,[
+                "Location" => "localhost:3000/login",
+                "Access-Control-Allow-Origin" => "*",
+                "Access-Control-Allow-Headers" => "*"
+            ]);        }
         return $response;
 
     }

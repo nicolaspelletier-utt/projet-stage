@@ -41,3 +41,4 @@ logout:
 islogged:
     path: /api/islogged
     controller: App\Controller\AuthController::islogged
+    
