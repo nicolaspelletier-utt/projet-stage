@@ -23,11 +23,28 @@ class StatsController extends AbstractController {
         $session = $requestStack->getSession();
         if ($session->has('logged')) {
             $db=$this->model->getInstance();
-            $query='';
-            $statement=$db->prepare($query);
-            $statement->execute();
+            if ($request->query->get('begin')!='' && $request->query->get('end')!='') {
+                $begin=$request->query->get('begin');
+                $end=$request->query->get('end');
+                $query='select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id and p.created_time between ? and ? group by p.entity_id order by count(p.post_id) desc';
+                $statement=$db->prepare($query);
+                $statement->execute(array(htmlspecialchars($begin),htmlspecialchars($end)));
+            }
+            else {
+                $query='select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id group by p.entity_id order by count(p.post_id) desc ';
+                $statement=$db->prepare($query);
+                $statement->execute();
+            }
             $result=$statement->fetchAll();
-            $result_json=json_encode($result);
+
+            $array=array();
+            foreach($result as $key=>$value) {
+                $array[$key]['id']=$key+1;
+                $array[$key]['name']=$value['name'];
+                $array[$key]['count']=$value['number'];
+
+            }
+            $result_json=json_encode($array);
             $response = new Response($result_json,200, [
                 "Content-Type" => "application/json"
             ]);
