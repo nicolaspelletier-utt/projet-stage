@@ -33,13 +33,12 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('redirect',301,[
-                "Location" => "localhost:3000/login",
-                "Access-Control-Allow-Origin" => "*",
-                "Access-Control-Allow-Headers" => "*"
-
-
-            ]);        }
+            $array=array('notLogged' => true);
+            $result_json=json_encode($array);
+            $response = new Response($result_json,200,[
+                "Content-Type" =>"application/json"
+            ]);
+             }
         return $response;
 
     }
@@ -71,12 +70,10 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('redirect',301,[
-                "Location" => "localhost:3000/login",
-                "Access-Control-Allow-Origin" => "*",
-                "Access-Control-Allow-Headers" => "*"
-
-
+            $array=array('notLogged' => true);
+            $result_json=json_encode($array);
+            $response = new Response($result_json,200,[
+                "Content-Type" =>"application/json"
             ]);
         }
         return $response;
@@ -114,13 +111,11 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('redirect',301,[
-                "Location" => "localhost:3000/login",
-                "Access-Control-Allow-Origin" => "*",
-                "Access-Control-Allow-Headers" => "*"
-
-
-            ]);        }
+            $array=array('notLogged' => true);
+            $result_json=json_encode($array);
+            $response = new Response($result_json,200,[
+                "Content-Type" =>"application/json"
+            ]);     }
         return $response;
 
     } 
@@ -155,11 +150,11 @@ class StatsController extends AbstractController {
             ]);
         }
         else {
-            $response = new Response('redirect',301,[
-                "Location" => "localhost:3000/login",
-                "Access-Control-Allow-Origin" => "*",
-                "Access-Control-Allow-Headers" => "*"
-            ]);        }
+            $array=array('notLogged' => true);
+            $result_json=json_encode($array);
+            $response = new Response($result_json,200,[
+                "Content-Type" =>"application/json"
+            ]);      }
         return $response;
 
     }
