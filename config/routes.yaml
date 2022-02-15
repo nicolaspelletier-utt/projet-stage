@@ -30,10 +30,6 @@ stats_nointerraction:
     path: /api/stats/nointerraction
     controller: App\Controller\StatsController::nointerraction
 
-table:
-    path: /api/table
-    controller: App\Controller\TableController::getTable
-
 logout:
     path: /api/logout
     controller: App\Controller\AuthController::logout
