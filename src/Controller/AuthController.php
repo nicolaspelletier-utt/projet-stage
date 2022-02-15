@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Controller;
+
+use App\Model\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
-use App\Model\Model;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends AbstractController
 {
@@ -19,46 +18,51 @@ class AuthController extends AbstractController
         $this->model = $model;
         $this->requestStack = $requestStack;
     }
+
     public function isLogged(Request $request)
     {
-        $session=$this->requestStack->getSession();
+        $session = $this->requestStack->getSession();
         if ($session->has('logged')) {
-            $array['logged']=true;
+            $array['logged'] = true;
         } else {
-            $array['logged']=false;
+            $array['logged'] = false;
         }
+
         return $this->json($array, 200);
     }
+
     public function login(Request $request)
     {
         $session = $this->requestStack->getSession();
-        $json=$request->getContent();
-        $jsondecode=json_decode($json, true);
-        $login=$jsondecode['login'];
-        $passwd=$jsondecode['passwd'];
+        $json = $request->getContent();
+        $jsondecode = json_decode($json, true);
+        $login = $jsondecode['login'];
+        $passwd = $jsondecode['passwd'];
         if (!$session->has('logged')) {
-            $db=$this->model->getInstance();
-            $hash=hash('sha512', md5(htmlentities($login)) . htmlentities($passwd));
-            $query="select id from authentification where hash='" . $hash . "'";
-            $statement=$db->prepare($query);
+            $db = $this->model->getInstance();
+            $hash = hash('sha512', md5(htmlentities($login)).htmlentities($passwd));
+            $query = "select id from authentification where hash='".$hash."'";
+            $statement = $db->prepare($query);
             $statement->execute();
             $results = $statement->fetchAll();
-            if (count($results)!=0) {
+            if (0 != count($results)) {
                 $session->set('logged', true);
             }
             if ($session->has('logged')) {
-                $array['logged']=true;
+                $array['logged'] = true;
             } else {
                 //Echec d'authentification
-                $array['logged']=false;
+                $array['logged'] = false;
             }
         } else {
             //Utilisateur déjà log
-            $array['logged']=true;
+            $array['logged'] = true;
         }
+
         return $this->json($array, 200);
         //$array_json=json_encode($array);
     }
+
     public function Logout(Request $request)
     {
         $session = $this->requestStack->getSession();
@@ -69,6 +73,7 @@ class AuthController extends AbstractController
         $response->headers->clearCookie('PHPSESSID');
         $session->invalidate();
         session_destroy();
+
         return $response;
     }
 }
