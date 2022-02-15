@@ -250,5 +250,67 @@ class StatsController extends AbstractController
         }
         return $response;
     }
+    public function unresponsive(Request $request)
+    {
+        $session = $this->requestStack->getSession();
+
+        if ($session->has('logged')) {
+            $db=$this->model->getInstance();
+            $param=false;
+            if ($request->query->get('begin')!='' && $request->query->get('end')!='') {
+                $param=true;
+                $begin=$request->query->get('begin');
+                $end=$request->query->get('end');
+                $query='select u.people_name, u.people_id, count(r.post_id) from data_people u, data_reactions r where u.people_id = r.people_id and created_time between ? and ?group by u.people_id order by  count(r.post_id) ASC limit 10  ';
+                $statement=$db->prepare($query);
+                $statement->execute(array(htmlspecialchars($begin),htmlspecialchars($end)));
+            } else {
+                $query='select u.people_name, u.people_id, count(r.post_id) from data_people u, data_reactions r where u.people_id = r.people_id group by u.people_id order by  count(r.post_id) ASC limit 10 ';
+                $statement=$db->prepare($query);
+                $statement->execute();
+            }
+
+            $result=$statement->fetchAll();
+            $array=array();
+            foreach ($result as $key=>$value) {
+                if ($param) {
+                    $query='select count(p.post_id) from data_posts p where p.people_id=? and created_time between ? and ?';
+                    $query2='select count(c.comment_id) from data_comments c where c.people_id=? and created_time between ? and ?';
+                    $statement=$db->prepare($query);
+                    $statement2=$db->prepare($query2);
+                    $statement2->execute(array($value['1'],htmlspecialchars($begin),htmlspecialchars($end)));
+                    $statement->execute(array($value['1'],htmlspecialchars($begin),htmlspecialchars($end)));
+                }
+                else {
+                    $query='select count(r.post_id) from data_reactions r where r.people_id=?';
+                    $query2='select count(c.comment_id) from data_comments c where c.people_id=?';
+                    $statement2=$db->prepare($query2);
+                    $statement2->execute(array($value['1']));
+                    $statement=$db->prepare($query);
+                    $statement->execute(array($value['1']));
+                }
+                $result=$statement->fetchAll();
+                $result2=$statement2->fetchAll();
+                $array[$key]['id']=$key+1;
+                $array[$key]['name']=$value['0'];
+                $array[$key]['reactions']=$value['2'];
+                $array[$key]['posts']=$result['0']['0'];
+                $array[$key]['comments']=$result2['0']['0'];
+
+
+            }
+            $result_json=json_encode($array);
+            $response = new Response($result_json, 200, [
+                "Content-Type" => "application/json"
+            ]);
+        } else {
+            $array=array('notLogged' => true);
+            $result_json=json_encode($array);
+            $response = new Response($result_json, 200, [
+                "Content-Type" =>"application/json"
+            ]);
+        }
+        return $response;
+    }
 }
 

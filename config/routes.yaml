@@ -45,3 +45,7 @@ islogged:
 table_users:
     path: /api/table/users
     controller: App\Controller\StatsController::usersNoLimit
+
+unresponsive_chart:
+    path: api/stats/unresponsive
+    controller: App\Controller\StatsController::unresponsive
