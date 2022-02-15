@@ -166,4 +166,43 @@ class StatsController extends AbstractController
         }
         return $response;
     }
+    public function usersNoLimit(Request $request)
+    {
+        $session = $this->requestStack->getSession();
+
+        if ($session->has('logged')) {
+            $db=$this->model->getInstance();
+            if ($request->query->get('begin')!='' && $request->query->get('end')!='') {
+                $begin=$request->query->get('begin');
+                $end=$request->query->get('end');
+                $query='select u.people_name, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and p.created_time between ? and ? group by u.people_id order by  count(p.post_id) DESC  ';
+                $statement=$db->prepare($query);
+                $statement->execute(array(htmlspecialchars($begin),htmlspecialchars($end)));
+            } else {
+            $query='select u.people_name, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id group by u.people_id order by  count(p.post_id) DESC  ';
+                $statement=$db->prepare($query);
+                $statement->execute();
+            }
+
+            $result=$statement->fetchAll();
+            $array=array();
+            foreach ($result as $key=>$value) {
+                $array[$key]['id']=$key+1;
+                $array[$key]['name']=$value['0'];
+                $array[$key]['count']=$value['1'];
+            }
+            $result_json=json_encode($array);
+            $response = new Response($result_json, 200, [
+                "Content-Type" => "application/json"
+            ]);
+        } else {
+            $array=array('notLogged' => true);
+            $result_json=json_encode($array);
+            $response = new Response($result_json, 200, [
+                "Content-Type" =>"application/json"
+            ]);
+        }
+        return $response;
+    }
 }
+

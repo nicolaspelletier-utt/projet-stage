@@ -42,3 +42,6 @@ islogged:
     path: /api/islogged
     controller: App\Controller\AuthController::islogged
     
+table_users:
+    path: /api/table/users
+    controller: App\Controller\StatsController::usersNoLimit
