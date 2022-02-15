@@ -287,7 +287,7 @@ class StatsController extends AbstractController
                     $statement2->execute([$value['1'], htmlspecialchars($begin), htmlspecialchars($end)]);
                     $statement->execute([$value['1'], htmlspecialchars($begin), htmlspecialchars($end)]);
                 } else {
-                    $query = 'select count(r.post_id) from data_reactions r where r.people_id=?';
+                    $query = 'select count(p.post_id) from data_posts p where p.people_id=?';
                     $query2 = 'select count(c.comment_id) from data_comments c where c.people_id=?';
                     $statement2 = $db->prepare($query2);
                     $statement2->execute([$value['1']]);
