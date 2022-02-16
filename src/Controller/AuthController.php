@@ -28,7 +28,10 @@ class AuthController extends AbstractController
             $array['logged'] = false;
         }
 
-        return $this->json($array, 200);
+        return $this->json($array, 200,[
+            'Access-Control-Allow-Origin' => 'localhost:3000',
+            'Access-Control-Allow-Credentials' => 'true'
+        ]);
     }
 
     public function login(Request $request)
@@ -59,7 +62,10 @@ class AuthController extends AbstractController
             $array['logged'] = true;
         }
 
-        return $this->json($array, 200);
+        return $this->json($array, 200, [
+            'Access-Control-Allow-Origin' => 'localhost:3000',
+            'Access-Control-Allow-Credentials' => 'true'
+        ]);
         //$array_json=json_encode($array);
     }
 
@@ -69,7 +75,10 @@ class AuthController extends AbstractController
         $session->remove('logged');
         $session->clear();
         $session = $this->requestStack->getSession();
-        $response = new Response('Success', 200);
+        $response = new Response('Success', 200,[
+            'Access-Control-Allow-Origin' => 'localhost:3000',
+            'Access-Control-Allow-Credentials' => 'true'
+        ]);
         $response->headers->clearCookie('PHPSESSID');
         $session->invalidate();
         session_destroy();

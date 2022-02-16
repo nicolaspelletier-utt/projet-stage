@@ -46,12 +46,16 @@ class StatsController extends AbstractController
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         } else {
             $array = ['notLogged' => true];
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
 
@@ -83,12 +87,16 @@ class StatsController extends AbstractController
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         } else {
             $array = ['notLogged' => true];
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
 
@@ -144,12 +152,16 @@ class StatsController extends AbstractController
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         } else {
             $array = ['notLogged' => true];
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
 
@@ -183,12 +195,16 @@ class StatsController extends AbstractController
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         } else {
             $array = ['notLogged' => true];
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
 
@@ -244,12 +260,16 @@ class StatsController extends AbstractController
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         } else {
             $array = ['notLogged' => true];
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
 
@@ -305,12 +325,16 @@ class StatsController extends AbstractController
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         } else {
             $array = ['notLogged' => true];
             $result_json = json_encode($array);
             $response = new Response($result_json, 200, [
                 'Content-Type' => 'application/json',
+                'Access-Control-Allow-Origin' => 'localhost:3000',
+                'Access-Control-Allow-Credentials' => 'true'
             ]);
         }
 
