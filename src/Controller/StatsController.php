@@ -174,16 +174,29 @@ class StatsController extends AbstractController
 
         if ($session->has('logged')) {
             $db = $this->model->getInstance();
-            if ('' != $request->query->get('begin') && '' != $request->query->get('end')) {
+            if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' == $request->query->get('search')) {
                 $begin = $request->query->get('begin');
                 $end = $request->query->get('end');
-                $query = "select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r where r.created_time between '2021-07-01 15:02:00' and '2021-07-31 15:02:30') and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10";
+                $query = "select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r where r.created_time between ? and ?) and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10";
                 $statement = $db->prepare($query);
-                $statement->execute([htmlspecialchars($begin), htmlspecialchars($end)]);
-            } else {
+                $statement->execute([htmlspecialchars($begin), htmlspecialchars($end),htmlspecialchars($begin), htmlspecialchars($end)]);
+            } else if ('' == $request->query->get('begin') && '' == $request->query->get('end') && '' == $request->query->get('search')) {
                 $query = 'select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r ) and dp.people_id not in (select c.people_id from data_comments c ) limit 10';
                 $statement = $db->prepare($query);
                 $statement->execute();
+            } else if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' != $request->query->get('search')) {
+                $begin = $request->query->get('begin');
+                $end = $request->query->get('end');
+                $search = $request->query->get('search');
+                $query='select distinct dp.people_name from data_people dp where dp.people_name like ? and dp.people_id not in (select r.people_id from data_reactions r where r.created_time between ? and ?) and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10';
+                $statement = $db->prepare($query);
+                $statement->execute([ "%" . htmlspecialchars($search) . "%",htmlspecialchars($begin), htmlspecialchars($end),htmlspecialchars($begin), htmlspecialchars($end)]);
+            } else {
+                $search = $request->query->get('search');
+                $query='select distinct dp.people_name from data_people dp where dp.people_name like ? and dp.people_id not in (select r.people_id from data_reactions r ) and dp.people_id not in (select c.people_id from data_comments c ) limit 10';
+                $statement = $db->prepare($query);
+                $statement->execute(["%" . htmlspecialchars($search) . "%"]);
+
             }
 
             $result = $statement->fetchAll();
