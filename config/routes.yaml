@@ -5,3 +5,43 @@ controllers:
 kernel:
     resource: ../src/Kernel.php
     type: annotation
+
+home:
+    path: /
+    controller: App\Controller\MainController::home
+
+login:
+    path: /api/login
+    controller: App\Controller\AuthController::login
+
+stats_posts:
+    path: /api/stats/posts
+    controller: App\Controller\StatsController::posts
+
+stats_comments:
+    path: /api/stats/comments
+    controller: App\Controller\StatsController::comments
+
+stats_users:
+    path: /api/stats/users
+    controller: App\Controller\StatsController::users
+
+stats_nointerraction:
+    path: /api/stats/nointerraction
+    controller: App\Controller\StatsController::nointerraction
+
+logout:
+    path: /api/logout
+    controller: App\Controller\AuthController::logout
+
+islogged:
+    path: /api/islogged
+    controller: App\Controller\AuthController::islogged
+    
+table_users:
+    path: /api/table/users
+    controller: App\Controller\StatsController::usersNoLimit
+
+unresponsive_chart:
+    path: api/stats/unresponsive
+    controller: App\Controller\StatsController::unresponsive

@@ -1,0 +1,60 @@
+version: '3'
+services:
+  api_serv:
+    build:
+      context: docker/apache
+    depends_on:
+      - api_db
+      - api_redis
+    environment:
+      - API_1339_ENV=docker
+      - API_1339_CONTEXT=work
+      - API_1339_ADMIN=1
+      - XDEBUG_CONFIG=remote_host=172.17.0.1
+    volumes:
+      - type: bind
+        source: .
+        target: /var/www/html
+    ports:
+      - 9090:80
+    networks:
+      - default
+
+  api_db:
+    build:
+      context: docker/mysql
+    volumes:
+      - ~/docker-volume/tmp/mysql57_dbData:/var/lib/mysql
+      - ./docker/mysql/config:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - default
+
+  api_redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - default
+
+  api_redis-commander:
+    image: rediscommander/redis-commander:latest
+    depends_on:
+      - api_redis
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:api_redis:6379
+    ports:
+      - 9091:8081
+    networks:
+      - default
+
+networks:
+  default:
+    external: false
+#https://stackoverflow.com/questions/38088279/communication-between-multiple-docker-compose-projects
+
+
