@@ -13,6 +13,7 @@ class StatsController extends AbstractController
 {
     protected $model;
     protected $requestStack;
+    protected $session;
 
     public function __construct(Model $model, RequestStack $requestStack)
     {

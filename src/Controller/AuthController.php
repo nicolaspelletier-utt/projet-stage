@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthController extends AbstractController
 {
     protected $model;
-    protected $requestStack;
     protected $param;
     protected $session;
     protected $auth;
@@ -21,7 +20,6 @@ class AuthController extends AbstractController
     public function __construct(model $model, RequestStack $requestStack, Param $paramFunctions, Auth $auth)
     {
         $this->model = $model;
-        $this->requestStack = $requestStack;
         $this->param = $paramFunctions;
         $this->session = $requestStack->getSession();
         $this->auth = $auth;
