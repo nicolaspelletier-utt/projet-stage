@@ -7,6 +7,8 @@ use PDO;
 
 class Model
 {
+    protected $db;
+
     public function getInstance(): PDO
     {
         try {
@@ -16,5 +18,10 @@ class Model
         } catch (Exception $e) {
             exit('Erreur : '.$e->getMessage());
         }
+    }
+    public function execQuery(string $query, array $values) : array {
+        $statement=$this->getInstance()->prepare($query);
+        $statement->execute($values);
+        return $statement->fetchAll();
     }
 }

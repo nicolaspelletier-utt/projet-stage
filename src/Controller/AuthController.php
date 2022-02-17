@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Model\Model;
+use App\Auth\Auth;
+use App\Param\Param;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,14 +14,16 @@ class AuthController extends AbstractController
 {
     protected $model;
     protected $requestStack;
+    protected $param;
 
-    public function __construct(model $model, RequestStack $requestStack)
+    public function __construct(model $model, RequestStack $requestStack, Param $paramFunctions)
     {
         $this->model = $model;
         $this->requestStack = $requestStack;
+        $this->param = $paramFunctions;
     }
 
-    public function isLogged(Request $request)
+    public function isLogged()
     {
         $session = $this->requestStack->getSession();
         if ($session->has('logged')) {
@@ -27,27 +31,17 @@ class AuthController extends AbstractController
         } else {
             $array['logged'] = false;
         }
+        return $this->param->successResponse($array);
 
-        return $this->json($array, 200,[
-            'Access-Control-Allow-Origin' => 'localhost:3000',
-            'Access-Control-Allow-Credentials' => 'true'
-        ]);
     }
 
-    public function login(Request $request)
+    public function login(Request $request, Auth $auth, Param $paramFunctions)
     {
         $session = $this->requestStack->getSession();
         $json = $request->getContent();
-        $jsondecode = json_decode($json, true);
-        $login = $jsondecode['login'];
-        $passwd = $jsondecode['passwd'];
         if (!$session->has('logged')) {
-            $db = $this->model->getInstance();
-            $hash = hash('sha512', md5(htmlentities($login)).htmlentities($passwd));
-            $query = "select id from authentification where hash='".$hash."'";
-            $statement = $db->prepare($query);
-            $statement->execute();
-            $results = $statement->fetchAll();
+            $query = "select id from authentification where hash=?";
+            $results = $this->model->execQuery($query,[$auth->hashGenerate(json_decode($json,true)['login'],json_decode($json,true)['passwd'])]);
             if (0 != count($results)) {
                 $session->set('logged', true);
             }
@@ -62,27 +56,18 @@ class AuthController extends AbstractController
             $array['logged'] = true;
         }
 
-        return $this->json($array, 200, [
-            'Access-Control-Allow-Origin' => 'localhost:3000',
-            'Access-Control-Allow-Credentials' => 'true'
-        ]);
-        //$array_json=json_encode($array);
+        return $paramFunctions->successResponse($array);
+
     }
 
-    public function Logout(Request $request)
+    public function Logout()
     {
         $session = $this->requestStack->getSession();
-        $session->remove('logged');
         $session->clear();
-        $session = $this->requestStack->getSession();
         $response = new Response('Success', 200,[
             'Access-Control-Allow-Origin' => 'localhost:3000',
             'Access-Control-Allow-Credentials' => 'true'
         ]);
-        $response->headers->clearCookie('PHPSESSID');
-        $session->invalidate();
-        session_destroy();
-
         return $response;
     }
 }
