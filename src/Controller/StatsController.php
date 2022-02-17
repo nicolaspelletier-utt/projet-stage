@@ -24,16 +24,28 @@ class StatsController extends AbstractController
         $session = $requestStack->getSession();
         if ($session->has('logged')) {
             $db = $this->model->getInstance();
-            if ('' != $request->query->get('begin') && '' != $request->query->get('end')) {
+            if ('' != $request->query->get('begin') && '' != $request->query->get('end')&& '' == $request->query->get('search')) {
                 $begin = $request->query->get('begin');
                 $end = $request->query->get('end');
                 $query = 'select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id and p.created_time between ? and ? group by p.entity_id order by count(p.post_id) desc';
                 $statement = $db->prepare($query);
                 $statement->execute([htmlspecialchars($begin), htmlspecialchars($end)]);
-            } else {
+            } else if ('' == $request->query->get('begin') && '' == $request->query->get('end') && '' == $request->query->get('search')) {
                 $query = 'select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id group by p.entity_id order by count(p.post_id) desc ';
                 $statement = $db->prepare($query);
                 $statement->execute();
+            } else if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' != $request->query->get('search')) {
+                $begin = $request->query->get('begin');
+                $end = $request->query->get('end');
+                $search = $request->query->get('search');
+                $query='select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.name like ? and e.id =p.entity_id and p.created_time between ? and ? group by p.entity_id order by count(p.post_id) desc';
+                $statement = $db->prepare($query);
+                $statement->execute([ "%" . htmlspecialchars($search) . "%",htmlspecialchars($begin), htmlspecialchars($end)]);
+            } else {
+                $search = $request->query->get('search');
+                $query='select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.name like ? and e.id =p.entity_id group by p.entity_id order by count(p.post_id) desc';
+                $statement = $db->prepare($query);
+                $statement->execute(["%" . htmlspecialchars($search) . "%"]);
             }
             $result = $statement->fetchAll();
 
@@ -121,7 +133,7 @@ class StatsController extends AbstractController
                 $query = 'select u.people_name, u.people_id, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id group by u.people_id order by  count(p.post_id) DESC limit 10 ';
                 $statement = $db->prepare($query);
                 $statement->execute();
-            }
+            } 
 
             $result = $statement->fetchAll();
             $array = [];
@@ -174,16 +186,29 @@ class StatsController extends AbstractController
 
         if ($session->has('logged')) {
             $db = $this->model->getInstance();
-            if ('' != $request->query->get('begin') && '' != $request->query->get('end')) {
+            if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' == $request->query->get('search')) {
                 $begin = $request->query->get('begin');
                 $end = $request->query->get('end');
-                $query = "select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r where r.created_time between '2021-07-01 15:02:00' and '2021-07-31 15:02:30') and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10";
+                $query = "select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r where r.created_time between ? and ?) and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10";
                 $statement = $db->prepare($query);
-                $statement->execute([htmlspecialchars($begin), htmlspecialchars($end)]);
-            } else {
+                $statement->execute([htmlspecialchars($begin), htmlspecialchars($end),htmlspecialchars($begin), htmlspecialchars($end)]);
+            } else if ('' == $request->query->get('begin') && '' == $request->query->get('end') && '' == $request->query->get('search')) {
                 $query = 'select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r ) and dp.people_id not in (select c.people_id from data_comments c ) limit 10';
                 $statement = $db->prepare($query);
                 $statement->execute();
+            } else if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' != $request->query->get('search')) {
+                $begin = $request->query->get('begin');
+                $end = $request->query->get('end');
+                $search = $request->query->get('search');
+                $query='select distinct dp.people_name from data_people dp where dp.people_name like ? and dp.people_id not in (select r.people_id from data_reactions r where r.created_time between ? and ?) and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10';
+                $statement = $db->prepare($query);
+                $statement->execute([ "%" . htmlspecialchars($search) . "%",htmlspecialchars($begin), htmlspecialchars($end),htmlspecialchars($begin), htmlspecialchars($end)]);
+            } else {
+                $search = $request->query->get('search');
+                $query='select distinct dp.people_name from data_people dp where dp.people_name like ? and dp.people_id not in (select r.people_id from data_reactions r ) and dp.people_id not in (select c.people_id from data_comments c ) limit 10';
+                $statement = $db->prepare($query);
+                $statement->execute(["%" . htmlspecialchars($search) . "%"]);
+
             }
 
             $result = $statement->fetchAll();
@@ -218,18 +243,33 @@ class StatsController extends AbstractController
         if ($session->has('logged')) {
             $db = $this->model->getInstance();
             $param = false;
-            if ('' != $request->query->get('begin') && '' != $request->query->get('end')) {
+            if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' == $request->query->get('search')) {
                 $param = true;
                 $begin = $request->query->get('begin');
                 $end = $request->query->get('end');
                 $query = 'select u.people_name, u.people_id,count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and p.created_time between ? and ? group by u.people_id order by  count(p.post_id) DESC  ';
                 $statement = $db->prepare($query);
                 $statement->execute([htmlspecialchars($begin), htmlspecialchars($end)]);
-            } else {
+            } else if ('' == $request->query->get('begin') && '' == $request->query->get('end') && '' == $request->query->get('search')) {
                 $query = 'select u.people_name,u.people_id, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id group by u.people_id order by  count(p.post_id) DESC  ';
                 $statement = $db->prepare($query);
                 $statement->execute();
+            } else if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' != $request->query->get('search')) {
+                $param = true;
+                $begin = $request->query->get('begin');
+                $end = $request->query->get('end');
+                $search = $request->query->get('search');
+                $query = 'select u.people_name, u.people_id, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and p.created_time between ? and ? and u.people_name like ? group by u.people_id order by  count(p.post_id) DESC ';
+                $statement = $db->prepare($query);
+                $statement->execute([htmlspecialchars($begin), htmlspecialchars($end), "%" . htmlspecialchars($search) . "%"]);
+            } else {
+                $search = $request->query->get('search');
+                $query = 'select u.people_name, u.people_id, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and u.people_name like ? group by u.people_id order by  count(p.post_id) DESC  ';
+                $statement = $db->prepare($query);
+                $statement->execute(["%" . htmlspecialchars($search) . "%"]);
+
             }
+
 
             $result = $statement->fetchAll();
             $array = [];
