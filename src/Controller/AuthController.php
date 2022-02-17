@@ -50,8 +50,7 @@ class AuthController extends AbstractController
 
     public function Logout()
     {
-        $session = $this->requestStack->getSession();
-        $session->clear();
+        $this->session->clear();
         $response = new Response('Success', 200,[
             'Access-Control-Allow-Origin' => 'localhost:3000',
             'Access-Control-Allow-Credentials' => 'true'
