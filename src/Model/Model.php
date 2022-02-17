@@ -19,9 +19,12 @@ class Model
             exit('Erreur : '.$e->getMessage());
         }
     }
-    public function execQuery(string $query, array $values) : array {
-        $statement=$this->getInstance()->prepare($query);
+
+    public function execQuery(string $query, array $values): array
+    {
+        $statement = $this->getInstance()->prepare($query);
         $statement->execute($values);
+
         return $statement->fetchAll();
     }
 }
