@@ -15,47 +15,35 @@ class AuthController extends AbstractController
     protected $model;
     protected $requestStack;
     protected $param;
+    protected $session;
+    protected $auth;
 
-    public function __construct(model $model, RequestStack $requestStack, Param $paramFunctions)
+    public function __construct(model $model, RequestStack $requestStack, Param $paramFunctions, Auth $auth)
     {
         $this->model = $model;
         $this->requestStack = $requestStack;
         $this->param = $paramFunctions;
+        $this->session = $requestStack->getSession();
+        $this->auth = $auth;
     }
 
     public function isLogged()
     {
-        $session = $this->requestStack->getSession();
-        if ($session->has('logged')) {
-            $array['logged'] = true;
-        } else {
-            $array['logged'] = false;
-        }
+        $array = $this->auth->setLogged($this->session);
         return $this->param->successResponse($array);
 
     }
 
     public function login(Request $request, Auth $auth, Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
-        $json = $request->getContent();
-        if (!$session->has('logged')) {
+        if (!$auth->isLogged($this->session)) {
             $query = "select id from authentification where hash=?";
-            $results = $this->model->execQuery($query,[$auth->hashGenerate(json_decode($json,true)['login'],json_decode($json,true)['passwd'])]);
+            $results = $this->model->execQuery($query,[$auth->hashGenerate(json_decode($request->getContent(),true)['login'],json_decode($request->getContent(),true)['passwd'])]);
             if (0 != count($results)) {
-                $session->set('logged', true);
+                $auth->setSuccesslogin($this->session);
             }
-            if ($session->has('logged')) {
-                $array['logged'] = true;
-            } else {
-                //Echec d'authentification
-                $array['logged'] = false;
-            }
-        } else {
-            //Utilisateur déjà log
-            $array['logged'] = true;
         }
-
+        $array = $auth->setLogged($this->session);
         return $paramFunctions->successResponse($array);
 
     }
