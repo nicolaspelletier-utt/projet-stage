@@ -24,16 +24,28 @@ class StatsController extends AbstractController
         $session = $requestStack->getSession();
         if ($session->has('logged')) {
             $db = $this->model->getInstance();
-            if ('' != $request->query->get('begin') && '' != $request->query->get('end')) {
+            if ('' != $request->query->get('begin') && '' != $request->query->get('end')&& '' == $request->query->get('search')) {
                 $begin = $request->query->get('begin');
                 $end = $request->query->get('end');
                 $query = 'select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id and p.created_time between ? and ? group by p.entity_id order by count(p.post_id) desc';
                 $statement = $db->prepare($query);
                 $statement->execute([htmlspecialchars($begin), htmlspecialchars($end)]);
-            } else {
+            } else if ('' == $request->query->get('begin') && '' == $request->query->get('end') && '' == $request->query->get('search')) {
                 $query = 'select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id group by p.entity_id order by count(p.post_id) desc ';
                 $statement = $db->prepare($query);
                 $statement->execute();
+            } else if ('' != $request->query->get('begin') && '' != $request->query->get('end') && '' != $request->query->get('search')) {
+                $begin = $request->query->get('begin');
+                $end = $request->query->get('end');
+                $search = $request->query->get('search');
+                $query='select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.name like ? and e.id =p.entity_id and p.created_time between ? and ? group by p.entity_id order by count(p.post_id) desc';
+                $statement = $db->prepare($query);
+                $statement->execute([ "%" . htmlspecialchars($search) . "%",htmlspecialchars($begin), htmlspecialchars($end)]);
+            } else {
+                $search = $request->query->get('search');
+                $query='select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.name like ? and e.id =p.entity_id group by p.entity_id order by count(p.post_id) desc';
+                $statement = $db->prepare($query);
+                $statement->execute(["%" . htmlspecialchars($search) . "%"]);
             }
             $result = $statement->fetchAll();
 
