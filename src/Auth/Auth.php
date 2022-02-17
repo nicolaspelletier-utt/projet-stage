@@ -29,4 +29,12 @@ class Auth
     public function setSuccesslogin(Session $session) : void {
         $session->set('logged',true);
     }
+    public function setNotLogged(Session $session) : array {
+        if ($session->has('logged')) {
+            $array['notLogged'] = false;
+        } else {
+            $array['notLogged'] = true;
+        }
+        return $array;
+    }
 }

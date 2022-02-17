@@ -2,29 +2,29 @@
 
 namespace App\Controller;
 
+use App\Auth\Auth;
 use App\Model\Model;
 use App\Param\Param;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 
 class StatsController extends AbstractController
 {
     protected $model;
-    protected $requestStack;
     protected $session;
+    protected $auth;
 
-    public function __construct(Model $model, RequestStack $requestStack)
+    public function __construct(Model $model, RequestStack $requestStack, Auth $auth)
     {
         $this->model = $model;
-        $this->requestStack = $requestStack;
+        $this->session = $requestStack->getSession();
+        $this->auth = $auth;
     }
 
     public function posts(Request $request, Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
-        if ($session->has('logged')) {
+        if ($this->auth->isLogged($this->session)) {
             $getParam = $paramFunctions->getArray($request);
             if ($paramFunctions->hasDateScope($request) && !$paramFunctions->hasFilter($request)) {
                 $query = 'select e.name, e.id, count(p.post_id) as number from data_posts p, data_entities e where e.id =p.entity_id and p.created_time between ? and ? group by p.entity_id order by count(p.post_id) desc';
@@ -48,7 +48,7 @@ class StatsController extends AbstractController
                 $array[$key]['count'] = $value['number'];
             }
         } else {
-            $array = ['notLogged' => true];
+            $array = $this->auth->setNotLogged($this->session);
         }
 
         return $paramFunctions->successResponse($array);
@@ -56,8 +56,7 @@ class StatsController extends AbstractController
 
     public function comments(Request $request, Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
-        if ($session->has('logged')) {
+        if ($this->auth->isLogged($this->session)) {
             $getParam = $paramFunctions->getArray($request);
             if ($paramFunctions->hasDateScope($request)) {
                 $query = 'select avg(de.value) from (select count(c.comment_id) as value from data_comments c where c.created_time between ? and ? group by c.post_id) de  ';
@@ -72,7 +71,7 @@ class StatsController extends AbstractController
                 'comments' => $result['0']['0'],
             ];
         } else {
-            $array = ['notLogged' => true];
+            $array = $this->auth->setNotLogged($this->session);
         }
 
         return $paramFunctions->successResponse($array);
@@ -81,9 +80,7 @@ class StatsController extends AbstractController
 
     public function users(Request $request, Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
-
-        if ($session->has('logged')) {
+        if ($this->auth->isLogged($this->session)) {
             $getParam = $paramFunctions->getArray($request);
             if ($paramFunctions->hasDateScope($request)) {
                 $query = 'select u.people_name, u.people_id, count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and p.created_time between ? and ? group by u.people_id order by  count(p.post_id) DESC limit 10 ';
@@ -113,7 +110,7 @@ class StatsController extends AbstractController
                 $array[$key]['comments'] = $result2['0']['0'];
             }
         } else {
-            $array = ['notLogged' => true];
+            $array = $this->auth->setNotLogged($this->session);
         }
 
         return $paramFunctions->successResponse($array);
@@ -121,9 +118,8 @@ class StatsController extends AbstractController
 
     public function nointerraction(Request $request,Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
 
-        if ($session->has('logged')) {
+        if ($this->auth->isLogged($this->session)) {
             $getParam = $paramFunctions->getArray($request);
             if ($paramFunctions->hasDateScope($request) && !$paramFunctions->hasFilter($request)) {
                 $query = "select distinct dp.people_name from data_people dp where dp.people_id not in (select r.people_id from data_reactions r where r.created_time between ? and ?) and dp.people_id not in (select c.people_id from data_comments c where c.created_time between ? and ?) limit 10";
@@ -145,16 +141,15 @@ class StatsController extends AbstractController
                 $array[$key]['name'] = $value['0'];
             }
         } else {
-            $array = ['notLogged' => true];
+            $array = $this->auth->setNotLogged($this->session);
         }
         return $paramFunctions->successResponse($array);
     }
 
     public function usersNoLimit(Request $request, Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
 
-        if ($session->has('logged')) {
+        if ($this->auth->isLogged($this->session)) {
             $getParam = $paramFunctions->getArray($request);
             if ($paramFunctions->hasDateScope($request) && !$paramFunctions->hasFilter($request)) {
                 $query = 'select u.people_name, u.people_id,count(p.post_id) from data_people u, data_posts p where u.people_id = p.people_id and p.created_time between ? and ? group by u.people_id order by  count(p.post_id) DESC  ';
@@ -190,7 +185,7 @@ class StatsController extends AbstractController
                 $array[$key]['comments'] = $result2['0']['0'];
             }
         } else {
-            $array = ['notLogged' => true];
+            $array = $this->auth->setNotLogged($this->session);
         }
         return $paramFunctions->successResponse($array);
 
@@ -198,9 +193,8 @@ class StatsController extends AbstractController
 
     public function unresponsive(Request $request, Param $paramFunctions)
     {
-        $session = $this->requestStack->getSession();
 
-        if ($session->has('logged')) {
+        if ($this->auth->isLogged($this->session)) {
             $getParam = $paramFunctions->getArray($request);
             if ($paramFunctions->hasDateScope($request)) {
                 $query = 'select u.people_name, u.people_id, count(r.post_id) from data_people u, data_reactions r where u.people_id = r.people_id and created_time between ? and ?group by u.people_id order by  count(r.post_id) ASC limit 10  ';
@@ -231,7 +225,7 @@ class StatsController extends AbstractController
                 $array[$key]['comments'] = $result2['0']['0'];
             }
         } else {
-            $array = ['notLogged' => true];
+            $array = $this->auth->setNotLogged($this->session);
         }
 
         return $paramFunctions->successResponse($array);
